@@ -10,14 +10,28 @@ interface AddExpenseFormProps {
     currency: CurrencyConfig;
 }
 
-const DEFAULT_CATEGORIES = [
-    "Food",
-    "Travel",
-    "Office",
+export const CATEGORIES = [
     "Software",
+    "Hosting",
+    "Cloud",
+    "Developer Tools",
     "Internet",
-    "Marketing",
-    "Other",
+    "Mobile",
+    "Courses",
+    "Books",
+    "Certifications",
+    "Freelance Fees",
+    "Payment Fees",
+    "Office Supplies",
+    "Coworking",
+    "Electricity",
+    "Transport",
+    "Fuel",
+    "Client Meeting",
+    "Food",
+    "Shopping",
+    "Entertainment",
+    "Health"
 ];
 
 export default function AddExpenseForm({ onClose, onAdd, currency }: AddExpenseFormProps) {
@@ -37,7 +51,7 @@ export default function AddExpenseForm({ onClose, onAdd, currency }: AddExpenseF
     useEffect(() => {
         if (typeof window !== "undefined") {
             const saved = localStorage.getItem("expense_zap_categories");
-            const list = saved ? JSON.parse(saved) : DEFAULT_CATEGORIES;
+            const list = saved ? JSON.parse(saved) : CATEGORIES;
             setCategories(list);
             if (list.length > 0 && !formData.category) {
                 setFormData((prev) => ({ ...prev, category: list[0] }));
@@ -128,14 +142,14 @@ export default function AddExpenseForm({ onClose, onAdd, currency }: AddExpenseF
                                     setFormData({ ...formData, category: e.target.value });
                                 }
                             }}
-                            className="w-full bg-zinc-800/50 border border-zinc-800 rounded-xl p-3 text-zinc-100"
+                            className="w-full bg-[#1e1e2f] border border-[#2a2a3a] rounded-[8px] p-[10px] text-[#e5e7eb] outline-none transition-all"
                         >
                             {categories.map((cat) => (
-                                <option key={cat} value={cat}>
+                                <option key={cat} value={cat} className="bg-[#1e1e2f] text-[#e5e7eb]">
                                     {cat}
                                 </option>
                             ))}
-                            <option value="__NEW__" className="text-emerald-400">+ Add Category</option>
+                            <option value="__NEW__" className="bg-[#1e1e2f] text-emerald-400 font-bold">+ Add Category</option>
                         </select>
                         {showNewCategoryInput && (
                             <input
