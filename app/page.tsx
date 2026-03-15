@@ -7,7 +7,7 @@ import SummaryCard from "@/components/SummaryCard";
 import AddExpenseForm from "@/components/AddExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
 import CategoryChart from "@/components/CategoryChart";
-import { Plus, IndianRupee, PieChart, Info, Download, Globe } from "lucide-react";
+import { Plus, IndianRupee, PieChart, Info, Download, Globe, Coffee } from "lucide-react";
 import { exportToCSV, exportToPDF } from "@/utils/export";
 
 export default function Home() {
@@ -59,78 +59,100 @@ export default function Home() {
     <main className="min-h-screen bg-zinc-950 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <header className="flex justify-between items-center py-4 border-b border-zinc-900">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
-              <span className="text-emerald-400">Expense</span>Zap
-            </h1>
-            <p className="text-xs text-zinc-400">Private, Offline Tracker for Indian Freelancers</p>
-          </div>
-          <div className="flex gap-2 items-center">
-            {/* Currency Selector */}
-            <div className="relative">
-              <button
-                onClick={() => setShowCurrencyPicker(!showCurrencyPicker)}
-                className="flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-2 rounded-xl text-xs border border-zinc-700 transition-colors"
-                title="Change Currency"
+        <header className="py-4 border-b border-zinc-900 flex flex-col gap-4">
+          {/* Top Section: Logo and Add Expense */}
+          <div className="flex flex-row justify-between items-center w-full">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 flex items-center gap-2">
+                <span className="text-emerald-400">Expense</span>Zap
+              </h1>
+              <p className="text-[10px] sm:text-xs text-zinc-400">Private, Offline Tracker for Freelancers</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href="https://buymeacoffee.com/mhmdrameez"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold px-3 py-2 rounded-xl text-xs transition-colors shadow-sm whitespace-nowrap"
               >
-                <Globe className="w-3.5 h-3.5" />
-                <span className="font-semibold">{currency.symbol}</span>
-                <span className="hidden sm:inline">{currency.code}</span>
+                <Coffee className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Buy me a coffee</span>
+                <span className="sm:hidden">Support ☕</span>
+              </a>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-3 sm:px-4 py-2 rounded-xl transition-all shadow-lg shadow-emerald-500/10 text-sm whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" color="black" />
+                <span className="hidden xs:inline">Add</span>
+                <span className="hidden sm:inline"> Expense</span>
               </button>
-              {showCurrencyPicker && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setShowCurrencyPicker(false)} />
-                  <div className="absolute right-0 top-full mt-2 z-50 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl w-64 max-h-80 overflow-y-auto">
-                    <div className="p-2 border-b border-zinc-800">
-                      <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider px-2">Select Currency</span>
+            </div>
+          </div>
+
+          {/* Bottom Section: Actions and Support */}
+          <div className="flex flex-wrap items-center justify-between gap-3 w-full">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Currency Selector */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowCurrencyPicker(!showCurrencyPicker)}
+                  className="flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs border border-zinc-700 transition-colors"
+                  title="Change Currency"
+                >
+                  <Globe className="w-3.5 h-3.5" />
+                  <span className="font-semibold">{currency.symbol}</span>
+                  <span className="hidden sm:inline">{currency.code}</span>
+                </button>
+                {showCurrencyPicker && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowCurrencyPicker(false)} />
+                    <div className="absolute left-0 top-full mt-2 z-50 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl w-64 max-h-80 overflow-y-auto">
+                      <div className="p-2 border-b border-zinc-800">
+                        <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider px-2">Select Currency</span>
+                      </div>
+                      {CURRENCIES.map((c, idx) => (
+                        <button
+                          key={`${c.code}-${c.country}`}
+                          onClick={() => handleCurrencyChange(c)}
+                          className={`w-full text-left px-3 py-2.5 flex items-center gap-3 hover:bg-zinc-800/60 transition-colors text-sm ${currency.code === c.code && currency.country === c.country ? "bg-emerald-500/10 text-emerald-400" : "text-zinc-300"
+                            }`}
+                        >
+                          <span className="text-base font-bold w-8 text-center">{c.symbol}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-xs">{c.code} — {c.name}</div>
+                            <div className="text-[10px] text-zinc-500">{c.country} · {c.taxName} ({c.defaultTaxRate}%)</div>
+                          </div>
+                          {currency.code === c.code && currency.country === c.country && (
+                            <span className="text-emerald-400 text-xs">✓</span>
+                          )}
+                        </button>
+                      ))}
                     </div>
-                    {CURRENCIES.map((c, idx) => (
-                      <button
-                        key={`${c.code}-${c.country}`}
-                        onClick={() => handleCurrencyChange(c)}
-                        className={`w-full text-left px-3 py-2.5 flex items-center gap-3 hover:bg-zinc-800/60 transition-colors text-sm ${currency.code === c.code && currency.country === c.country ? "bg-emerald-500/10 text-emerald-400" : "text-zinc-300"
-                          }`}
-                      >
-                        <span className="text-base font-bold w-8 text-center">{c.symbol}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-xs">{c.code} — {c.name}</div>
-                          <div className="text-[10px] text-zinc-500">{c.country} · {c.taxName} ({c.defaultTaxRate}%)</div>
-                        </div>
-                        {currency.code === c.code && currency.country === c.country && (
-                          <span className="text-emerald-400 text-xs">✓</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
+
+              <button
+                onClick={() => exportToCSV(expenses)}
+                disabled={expenses.length === 0}
+                className="flex items-center gap-1 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs border border-zinc-700"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>CSV</span>
+              </button>
+              <button
+                onClick={() => exportToPDF(expenses, totalExpense, totalGst, currency)}
+                disabled={expenses.length === 0}
+                className="flex items-center gap-1 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs border border-zinc-700"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>PDF</span>
+              </button>
             </div>
 
-            <button
-              onClick={() => exportToCSV(expenses)}
-              disabled={expenses.length === 0}
-              className="flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 px-3 py-2 rounded-xl text-xs border border-zinc-700"
-            >
-              <Download className="w-3.5 h-3.5" />
-              CSV
-            </button>
-            <button
-              onClick={() => exportToPDF(expenses, totalExpense, totalGst, currency)}
-              disabled={expenses.length === 0}
-              className="flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 px-3 py-2 rounded-xl text-xs border border-zinc-700"
-            >
-              <Download className="w-3.5 h-3.5" />
-              PDF
-            </button>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-emerald-500/10 ml-2"
-            >
-              <Plus className="w-5 h-5" color="black" />
-              <span className="hidden sm:inline">Add Expense</span>
-            </button>
           </div>
+
         </header>
 
         {/* Stats Grid */}
@@ -169,10 +191,12 @@ export default function Home() {
         </div>
 
         {/* Add Modal */}
-        {isModalOpen && (
-          <AddExpenseForm onClose={() => setIsModalOpen(false)} onAdd={handleAddExpense} currency={currency} />
-        )}
-      </div>
-    </main>
+        {
+          isModalOpen && (
+            <AddExpenseForm onClose={() => setIsModalOpen(false)} onAdd={handleAddExpense} currency={currency} />
+          )
+        }
+      </div >
+    </main >
   );
 }
