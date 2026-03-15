@@ -33,9 +33,19 @@ export const exportToCSV = (expenses: Expense[]) => {
     document.body.removeChild(link);
 };
 
+// Helper to get a symbol that is safe for jsPDF standard fonts (which lack full Unicode support)
+const getSafePdfSymbol = (cur: CurrencyConfig) => {
+    if (cur.code === "INR") return "Rs. ";
+    // Standard ASCII symbols that work in Helvetic/Times
+    if (["$", "£"].includes(cur.symbol)) return cur.symbol;
+    // For others like €, ¥, ₹ etc that might fail, we return empty so the code handles it
+    return "";
+};
+
 export const exportToPDF = (expenses: Expense[], totalExpense: number, totalGst: number, currency?: CurrencyConfig) => {
     if (expenses.length === 0) return;
     const cur = currency || getSavedCurrency();
+    const safeSymbol = getSafePdfSymbol(cur);
 
     const doc = new jsPDF();
 
@@ -52,8 +62,8 @@ export const exportToPDF = (expenses: Expense[], totalExpense: number, totalGst:
     // Summary section
     doc.setFontSize(12);
     doc.setTextColor(0);
-    doc.text(`Total Expenses: ${cur.code} ${cur.symbol}${totalExpense.toFixed(2)}`, 14, 40);
-    doc.text(`Total ${cur.taxName} Paid: ${cur.code} ${cur.symbol}${totalGst.toFixed(2)}`, 14, 48);
+    doc.text(`Total Expenses: ${cur.code} ${safeSymbol}${totalExpense.toFixed(2)}`, 14, 40);
+    doc.text(`Total ${cur.taxName} Paid: ${cur.code} ${safeSymbol}${totalGst.toFixed(2)}`, 14, 48);
 
     // Table
     const tableHeaders = [["Date", "Category", "Description", "Subtotal", cur.taxName, "Total"]];
@@ -61,9 +71,9 @@ export const exportToPDF = (expenses: Expense[], totalExpense: number, totalGst:
         new Date(e.date).toLocaleDateString(cur.locale),
         e.category,
         e.description,
-        `${cur.symbol}${e.subtotal.toFixed(2)}`,
-        `${cur.symbol}${e.gstAmount.toFixed(2)}`,
-        `${cur.symbol}${e.total.toFixed(2)}`,
+        `${safeSymbol}${e.subtotal.toFixed(2)}`,
+        `${safeSymbol}${e.gstAmount.toFixed(2)}`,
+        `${safeSymbol}${e.total.toFixed(2)}`,
     ]);
 
     autoTable(doc, {

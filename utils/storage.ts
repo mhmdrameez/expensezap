@@ -1,4 +1,5 @@
 import { saveReceipt, deleteReceipt } from "./db";
+import { encryptData, decryptData } from "./encryption";
 
 export interface Expense {
     id: string;
@@ -20,12 +21,22 @@ const STORAGE_KEY = 'expense_zap_data';
 export const getExpenses = (): Expense[] => {
     if (typeof window === 'undefined') return [];
     const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    if (!data) return [];
+
+    try {
+        const decrypted = decryptData(data);
+        return JSON.parse(decrypted);
+    } catch (error) {
+        console.error('Failed to parse expenses:', error);
+        return [];
+    }
 };
 
 export const saveExpenses = (expenses: Expense[]): void => {
     if (typeof window === 'undefined') return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+    const json = JSON.stringify(expenses);
+    const encrypted = encryptData(json);
+    localStorage.setItem(STORAGE_KEY, encrypted);
 };
 
 export const addExpense = (expense: Omit<Expense, 'id' | 'createdAt'>, receiptImage?: string): Expense => {
